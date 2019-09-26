@@ -12,45 +12,45 @@ public class ProcessLine implements BiFunction<Query,List<WaitingTimeLine>,Strin
                     (wtl.getType().contains(q.getType()) || q.getType().contains("*")) &&
                     wtl.getPn().contains(q.getPn()) &&
                     !q.getStart().after(wtl.getWtlDate()) && !q.getEnd().before(wtl.getWtlDate())) {
-
-                count += wtl.getMin();
-                interCount += 1;
-
+                count+= wtl.getMin();
+                interCount+=1;
             }
         }
-        return interCount != 0 ? (count / interCount) + "\n" : "-" + "\n";
+        return interCount != 0 ? (count/interCount) + "\n" : "-" + "\n";
     }
 
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner("7" + "\n" +
+                "7" + "\n" +
+
+                "C 1.1 8.15.1 P 15.10.2012 83" + "\n" +
+                "C 1.1 8.15.1 P 15.10.2012 83" + "\n" +
+                "C 1.1 8.15.1 P 15.10.2012 83" + "\n" +
+                "C 1.1 8.15.1 P 15.10.2012 83" + "\n" +
                 "C 1.1 8.15.1 P 15.10.2012 83" + "\n" +
                 "C 1 10.1 P 01.12.2012 65" + "\n" +
+                "C 1.1 5.5.1 P 01.11.2012 117" + "\n" +
                 "C 1.1 5.5.1 P 01.11.2012 117" + "\n" +
                 "D 1.1 8 P 01.01.2012-01.12.2012" + "\n" +
                 "C 3 10.2 N 02.10.2012 100" + "\n" +
                 "D 1 * P 8.10.2012-20.11.2012" + "\n" +
-                "D 3.1 10.15 P 01.12.2012");
+                "D 3.1 10.15 P 01.12.2012").useDelimiter("\n");
 
 
         List<WaitingTimeLine> waitingTimeLines = new ArrayList<>();
         List<Query> queries = new ArrayList<>();
+        List<String> strings = new ArrayList<>();
 
-        int lines = scanner.nextInt();
-        for (int i = 0; i <= lines; i++) {
-            String s = scanner.nextLine();
-            if (s.startsWith("C")) {
-                waitingTimeLines.add(new WaitingTimeLine(s));
-            }
-            if(s.startsWith("D")){queries.add(new Query(s));}
-        }
 
-        List<String> minutes=new ArrayList<>();
-        for (Query query : queries) {
-            minutes.add(new ProcessLine().apply(query, waitingTimeLines));
-        }
-        minutes.stream().forEach(System.out::print);
+
+        scanner.forEachRemaining(s->strings.add(s));
+        strings.stream().filter(s->s.startsWith("D")).forEach((s -> queries.add(new Query(s))));
+        strings.stream().filter(s->s.startsWith("C")).forEach((s->waitingTimeLines.add(new WaitingTimeLine(s))));
+        queries.stream().map((s)->new ProcessLine().apply(s,waitingTimeLines)).forEach(System.out::print);
+
+
     }
 }
 
